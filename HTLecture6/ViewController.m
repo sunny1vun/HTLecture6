@@ -180,7 +180,7 @@
                 }
             }
         }
-    }else {
+    }else {//No need for this else for now, it would be need for doubleTap-problem or just delete and make another one massage (method)
         CGPoint position = [touch locationInView:self.view];
         CGFloat screenHeight = self.view.frame.size.height;
         if (position.y < screenHeight/2) {
