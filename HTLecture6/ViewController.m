@@ -170,6 +170,7 @@
     
     [UIView beginAnimations:@"someAnimation" context:nil];
     [UIView setAnimationDuration:0.3f];
+    //обращаемся к вью, к перемещаемому вью, центр вью перенести к position а position это координаты вью объявленного тача тача строчка 163
     self.movedView.center= position;
     [UIView commitAnimations];
 }
