@@ -75,24 +75,16 @@
         if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
             
             [ViewController switcher:2 view:someView];
-        }
-        
-        if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
+        }else if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
             
             [ViewController switcher:3 view:someView];
-        }
-        
-        if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
+        }else if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
             
             [ViewController switcher:4 view:someView];
-        }
-        
-        if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
+        }else if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
             
             [ViewController switcher:5 view:someView];
-        }
-        
-        if ( (18<= i && i<= 20)) {
+        }else if ( (18<= i && i<= 20)) {
             
             [ViewController switcher:6 view:someView];
         }
@@ -119,29 +111,19 @@
         if (i<= 1 || 37<= i) {
             
             [ViewController switcher:1 view:someView];
-        }
-        
-        if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
+        }else if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
             
             [ViewController switcher:2 view:someView];
-        }
-        
-        if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
+        }else if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
             
             [ViewController switcher:3 view:someView];
-        }
-        
-        if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
+        }else if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
             
             [ViewController switcher:4 view:someView];
-        }
-        
-        if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
+        }else if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
             
             [ViewController switcher:5 view:someView];
-        }
-        
-        if ( (18<= i && i<= 20)) {
+        }else if ( (18<= i && i<= 20)) {
             
             [ViewController switcher:6 view:someView];
         }
