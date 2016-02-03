@@ -70,9 +70,7 @@
         if (i<= 1 || 37<= i) {
             
             [ViewController switcher:1 view:someView];
-        }
-        
-        if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
+        }else if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
             
             [ViewController switcher:2 view:someView];
         }else if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
