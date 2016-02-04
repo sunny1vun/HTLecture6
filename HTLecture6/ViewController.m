@@ -18,10 +18,13 @@
 
 -(CGFloat)paintTopRects;
 -(CGFloat)paintBotRects;
+-(void)restoreViews;
 
 @end
 
 @implementation ViewController
+
+static BOOL wasSwinged;
 
 +(void)switcher:(int)someCase view:(UIView*)someView{
     switch (someCase) {
@@ -154,12 +157,17 @@
     [self.view addSubview:line];
     
     [self paintBotRects];
-    
+    wasSwinged= NO;
     self.isAnimating= NO;
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(touchHandler:)];
     doubleTap.numberOfTapsRequired = 2;
     doubleTap.numberOfTouchesRequired = 1;
     [self.view addGestureRecognizer:doubleTap];
+    
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(restoreViews)];
+    singleTap.numberOfTapsRequired = 1;
+    singleTap.numberOfTouchesRequired = 1;
+    [self.view addGestureRecognizer:singleTap];
     
 }
 
@@ -172,8 +180,9 @@
     NSArray *topRects= [self.arrayOfViews subarrayWithRange: NSMakeRange(0, 39) ];
     NSArray *botRects= [self.arrayOfViews subarrayWithRange:NSMakeRange(39, 39)];
 //    animation=NO;
+    
     if (self.isAnimating) {
-        
+        wasSwinged= YES;
         CGPoint position = [touch locationInView:self.view];
         CGFloat screenHeight = self.view.frame.size.height;
         if (position.y < screenHeight/2) {
@@ -208,9 +217,29 @@
         
 //        [self paintTopRects];
 //        [self paintBotRects];
+        if(wasSwinged){
+//            [self restoreViews];
+            for (UIView *view in topRects) {
+                [view.layer removeAllAnimations];
+                CGRect frame = view.frame;
+                //                frame.origin.y = frame.origin.y- 2.5*i;
+                frame.origin.y= 98;
+                frame.size.height = 90;
+                view.frame = frame;
+            }
+            for (UIView *view in botRects){
+                [view.layer removeAllAnimations];
+                CGRect frame = view.frame;
+                //                frame.origin.y = frame.origin.y- 2.5*i;
+                frame.origin.y= 194.5;
+                frame.size.height = 90;
+                view.frame = frame;
+            }
+        }
+        wasSwinged= NO;
         int i = 1;
-        for (UIView *view in topRects) {
-            [UIView animateWithDuration:1.0f delay:i*0.05f options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat animations:^{
+        for (UIView *view in topRects) {//miracle is made because of UI...OptionRepeat<<1666666, to fix delete "<<166666"
+            [UIView animateWithDuration:1.0f delay:i*0.05f options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat<<166666666 animations:^{
                 CGRect frame = view.frame;
 //                frame.origin.y = frame.origin.y- 2.5*i;
                 frame.origin.y= frame.origin.y+ frame.size.height - 10;
@@ -222,7 +251,7 @@
         
         i = 1;
         for (UIView *view in botRects) {
-            [UIView animateWithDuration:1.0f delay:i*0.05f+1.f options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat animations:^{
+            [UIView animateWithDuration:1.0f delay:i*0.05f+1.f options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat<<166666666 animations:^{
                 CGRect frame = view.frame;
 //                frame.origin.y = frame.origin.y + 2.5*i;
                 frame.size.height = 10;
@@ -233,11 +262,29 @@
     }
 }
 
-//
-//-(void)moveWithTouch:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    UITouch *touch= [touches anyObject];
-//    [self touchHandler:touch];
-//}
+-(void)restoreViews{
+    if (self.isAnimating) {
+        NSArray *topRects= [self.arrayOfViews subarrayWithRange: NSMakeRange(0, 39) ];
+        NSArray *botRects= [self.arrayOfViews subarrayWithRange:NSMakeRange(39, 39)];
+        for (UIView *view in topRects) {
+            [view.layer removeAllAnimations];
+            CGRect frame = view.frame;
+            //                frame.origin.y = frame.origin.y- 2.5*i;
+            frame.origin.y= 98;
+            frame.size.height = 90;
+            view.frame = frame;
+        }
+        for (UIView *view in botRects){
+            [view.layer removeAllAnimations];
+            CGRect frame = view.frame;
+            //                frame.origin.y = frame.origin.y- 2.5*i;
+            frame.origin.y= 194.5;
+            frame.size.height = 90;
+            view.frame = frame;
+        }
+
+    }
+}
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     
@@ -252,19 +299,14 @@
     //self.isAnimating=NO;
     
 }
-
--(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    //self.isAnimating= NO;
-//    UITouch *touch= [touches anyObject];
-    //[self touchHandler:touch isAnimating:YES];
-    
-}
-
-//-(void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    UITouch *touch= [touches anyObject];
-//    [self touchHandler:touch];
 //
+//-(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+//    //self.isAnimating= NO;
+////    UITouch *touch= [touches anyObject];
+//    //[self touchHandler:touch isAnimating:YES];
+//    
 //}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
