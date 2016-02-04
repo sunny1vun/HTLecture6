@@ -13,6 +13,8 @@
 +(void)switcher:(int)someCase view:(UIView*)someView;
 
 @property (nonatomic, weak) UIView *movedView;
+@property (nonatomic, strong) NSMutableArray *arrayOfViews;
+@property (nonatomic) BOOL isAnimating;
 
 @end
 
@@ -70,29 +72,19 @@
         if (i<= 1 || 37<= i) {
             
             [ViewController switcher:1 view:someView];
-        }
-        
-        if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
+        }else if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
             
             [ViewController switcher:2 view:someView];
-        }
-        
-        if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
+        }else if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
             
             [ViewController switcher:3 view:someView];
-        }
-        
-        if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
+        }else if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
             
             [ViewController switcher:4 view:someView];
-        }
-        
-        if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
+        }else if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
             
             [ViewController switcher:5 view:someView];
-        }
-        
-        if ( (18<= i && i<= 20)) {
+        }else if ( (18<= i && i<= 20)) {
             
             [ViewController switcher:6 view:someView];
         }
@@ -102,6 +94,8 @@
         myX+= 17.5f;
     
     }
+    
+    self.arrayOfViews =arrayOfViews;
     
     UIView *line= [[UIView alloc] initWithFrame: CGRectMake(0.f, 191.f, myX+2.f, 1.f)];
     line.backgroundColor = [[UIColor alloc] initWithRed:84/255.f green:113/255.f blue:125/255.f alpha:1];
@@ -114,34 +108,25 @@
     for (int i= 0; i< 39; i++) {
         //В качестве аргумента типа CGFloat нужно указывать число в поинтах, с расширением .f
         someView= [[UIView alloc] initWithFrame: CGRectMake(myX, 194.5f, 15.f, 90.f)];
+        
         someView.layer.cornerRadius= 3.f;
         [arrayOfViews addObject: someView];
         if (i<= 1 || 37<= i) {
             
             [ViewController switcher:1 view:someView];
-        }
-        
-        if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
+        }else if ( (2<= i && i<= 5)|| (33<= i && i<= 36)) {
             
             [ViewController switcher:2 view:someView];
-        }
-        
-        if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
+        }else if ( (6<= i && i<= 9) || (29<= i && i<= 32)) {
             
             [ViewController switcher:3 view:someView];
-        }
-        
-        if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
+        }else if ( (10<= i && i<= 13) || (25<= i && i<= 28)) {
             
             [ViewController switcher:4 view:someView];
-        }
-        
-        if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
+        }else if ( (14<= i && i<= 17) || (21<= i && i<= 24)) {
             
             [ViewController switcher:5 view:someView];
-        }
-        
-        if ( (18<= i && i<= 20)) {
+        }else if ( (18<= i && i<= 20)) {
             
             [ViewController switcher:6 view:someView];
         }
@@ -152,50 +137,101 @@
         
     }
     
-    
+    [self.arrayOfViews addObjectsFromArray:arrayOfViews];
+//    self.arrayOfViews= [self.arrayOfViews insertObjects:arrayOfViews atIndexes:[[NSIndexSet alloc] initWithIndex:39]] ;
+    self.isAnimating= NO;
 }
 
 -(BOOL)prefersStatusBarHidden{
     return YES;
 }
 
--(void)moveWithTouch:(UITouch*)touch {
-    CGPoint position= [touch locationInView: touch.view];
-    CGPoint previousPosition= [touch previousLocationInView:touch.view];
-    
-    CGRect frame= touch.view.frame;
-    frame.origin.x-= (previousPosition.x- position.x);
-    frame.origin.y-= (previousPosition.y- position.y);
-    touch.view.frame= frame;
-    
-    [UIView beginAnimations:@"someAnimation" context:nil];
-    [UIView setAnimationDuration:0.3f];
-    self.movedView.center= position;
-    [UIView commitAnimations];
+#pragma mark - Touches!
+- (void)touchHandler:(UITouch*)touch{
+    NSArray *topRects= [self.arrayOfViews subarrayWithRange: NSMakeRange(0, 39) ];
+    NSArray *botRects= [self.arrayOfViews subarrayWithRange:NSMakeRange(39, 39)];
+    if (self.isAnimating) {
+        
+        CGPoint position = [touch locationInView:self.view];
+        CGFloat screenHeight = self.view.frame.size.height;
+        if (position.y < screenHeight/2) {
+            for (UIView *view in topRects){
+                if (((CGRectGetMinX(view.frame)<= position.x) && (position.x<= CGRectGetMaxX(view.frame)))){
+                    [UIView animateWithDuration:0.1f animations:^{
+                        CGRect frame = view.frame;
+//                        frame.origin.y = position.y - 3;
+                        frame.origin.y = position.y+1.f;
+
+                        frame.size.height = screenHeight/2 - position.y;
+                        view.frame = frame;
+                    }];
+                }
+            }
+        }
+        else if (position.y > screenHeight/2){
+            for (UIView *view in botRects){
+                if (((CGRectGetMinX(view.frame)<= position.x) && (position.x<= CGRectGetMaxX(view.frame)))){
+                    [UIView animateWithDuration:0.1f animations:^{
+                        CGRect frame = view.frame;
+                        frame.origin.y = position.y+7.f;
+                        frame.size.height = screenHeight/2 - position.y;
+                        view.frame = frame;
+                    }];
+                }
+            }
+        }
+    }else {//No need for this else for now, it would be need for doubleTap-problem or just delete and make another one massage (method)
+        CGPoint position = [touch locationInView:self.view];
+        CGFloat screenHeight = self.view.frame.size.height;
+        if (position.y < screenHeight/2) {
+            for (UIView *view in topRects){
+                if (((CGRectGetMinX(view.frame)<= position.x) && (position.x<= CGRectGetMaxX(view.frame)))){
+                    [UIView animateWithDuration:0.1f animations:^{
+                        CGRect frame = view.frame;
+                        //                        frame.origin.y = position.y - 3;
+                        frame.origin.y = position.y+1.f;
+                        
+                        frame.size.height = screenHeight/2 - position.y;
+                        view.frame = frame;
+                    }];
+                }
+            }
+        }
+    }
 }
 
+//
+//-(void)moveWithTouch:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+//    UITouch *touch= [touches anyObject];
+//    [self touchHandler:touch];
+//}
+
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    
+    self.isAnimating= YES;
+    
     UITouch *touch= [touches anyObject];
-    [self moveWithTouch:touch];
+    [self touchHandler:touch];
 }
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     UITouch *touch= [touches anyObject];
-    [self moveWithTouch:touch];
+    [self touchHandler:touch];
     
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    self.isAnimating= NO;
     UITouch *touch= [touches anyObject];
-    [self moveWithTouch:touch];
+    [self touchHandler:touch];
     
 }
 
--(void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    UITouch *touch= [touches anyObject];
-    [self moveWithTouch:touch];
-
-}
+//-(void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+//    UITouch *touch= [touches anyObject];
+//    [self touchHandler:touch];
+//
+//}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
