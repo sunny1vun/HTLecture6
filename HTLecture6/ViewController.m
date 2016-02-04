@@ -16,6 +16,9 @@
 @property (nonatomic, strong) NSMutableArray *arrayOfViews;
 @property (nonatomic) BOOL isAnimating;
 
+-(CGFloat)paintTopRects;
+-(CGFloat)paintBotRects;
+
 @end
 
 @implementation ViewController
@@ -54,18 +57,14 @@
 
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-
-    self.view.backgroundColor= [[UIColor alloc] initWithRed:24/255.f green:54/255.f blue:66/255.f alpha:1];
-    
+-(CGFloat)paintTopRects{
     NSMutableArray *arrayOfViews= [[NSMutableArray alloc] init];
     
     UIView *someView;
     CGFloat myX= 2.f;
     
     for (int i= 0; i< 39; i++) {
-    //В качестве аргумента типа CGFloat нужно указывать число в поинтах, с расширением .f
+        //В качестве аргумента типа CGFloat нужно указывать число в поинтах, с расширением .f
         someView= [[UIView alloc] initWithFrame: CGRectMake(myX, 98.5f, 15.f, 90.f)];
         someView.layer.cornerRadius= 3.f;
         [arrayOfViews addObject: someView];
@@ -92,18 +91,19 @@
         [self.view addSubview:someView];
         
         myX+= 17.5f;
-    
+        
     }
     
     self.arrayOfViews =arrayOfViews;
+    return myX;
+}
+
+-(CGFloat)paintBotRects{
+    NSMutableArray *arrayOfViews= [[NSMutableArray alloc] init];
     
-    UIView *line= [[UIView alloc] initWithFrame: CGRectMake(0.f, 191.f, myX+2.f, 1.f)];
-    line.backgroundColor = [[UIColor alloc] initWithRed:84/255.f green:113/255.f blue:125/255.f alpha:1];
+    UIView *someView;
+    CGFloat myX= 2.f;
     
-    [self.view addSubview:line];
-    
-    arrayOfViews= [[NSMutableArray alloc] init];
-    myX= 2.f;
     
     for (int i= 0; i< 39; i++) {
         //В качестве аргумента типа CGFloat нужно указывать число в поинтах, с расширением .f
@@ -138,8 +138,29 @@
     }
     
     [self.arrayOfViews addObjectsFromArray:arrayOfViews];
-//    self.arrayOfViews= [self.arrayOfViews insertObjects:arrayOfViews atIndexes:[[NSIndexSet alloc] initWithIndex:39]] ;
+    return myX;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    self.view.backgroundColor= [[UIColor alloc] initWithRed:24/255.f green:54/255.f blue:66/255.f alpha:1];
+    
+    CGFloat myX= [self paintTopRects];
+    
+    UIView *line= [[UIView alloc] initWithFrame: CGRectMake(0.f, 191.f, myX+2.f, 1.f)];
+    line.backgroundColor = [[UIColor alloc] initWithRed:84/255.f green:113/255.f blue:125/255.f alpha:1];
+    
+    [self.view addSubview:line];
+    
+    [self paintBotRects];
+    
     self.isAnimating= NO;
+    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(touchHandler:)];
+    doubleTap.numberOfTapsRequired = 2;
+    doubleTap.numberOfTouchesRequired = 1;
+    [self.view addGestureRecognizer:doubleTap];
+    
 }
 
 -(BOOL)prefersStatusBarHidden{
@@ -150,6 +171,7 @@
 - (void)touchHandler:(UITouch*)touch{
     NSArray *topRects= [self.arrayOfViews subarrayWithRange: NSMakeRange(0, 39) ];
     NSArray *botRects= [self.arrayOfViews subarrayWithRange:NSMakeRange(39, 39)];
+//    animation=NO;
     if (self.isAnimating) {
         
         CGPoint position = [touch locationInView:self.view];
@@ -180,22 +202,33 @@
                 }
             }
         }
+        self.isAnimating= NO;
     }else {//No need for this else for now, it would be need for doubleTap-problem or just delete and make another one massage (method)
-        CGPoint position = [touch locationInView:self.view];
-        CGFloat screenHeight = self.view.frame.size.height;
-        if (position.y < screenHeight/2) {
-            for (UIView *view in topRects){
-                if (((CGRectGetMinX(view.frame)<= position.x) && (position.x<= CGRectGetMaxX(view.frame)))){
-                    [UIView animateWithDuration:0.1f animations:^{
-                        CGRect frame = view.frame;
-                        //                        frame.origin.y = position.y - 3;
-                        frame.origin.y = position.y+1.f;
-                        
-                        frame.size.height = screenHeight/2 - position.y;
-                        view.frame = frame;
-                    }];
-                }
-            }
+//        //self.isAnimating = YES;
+        
+//        [self paintTopRects];
+//        [self paintBotRects];
+        int i = 1;
+        for (UIView *view in topRects) {
+            [UIView animateWithDuration:1.0f delay:i*0.05f options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat animations:^{
+                CGRect frame = view.frame;
+//                frame.origin.y = frame.origin.y- 2.5*i;
+                frame.origin.y= frame.origin.y+ frame.size.height - 10;
+                frame.size.height = 10;
+                view.frame = frame;
+            } completion:nil];
+            i++;
+        }
+        
+        i = 1;
+        for (UIView *view in botRects) {
+            [UIView animateWithDuration:1.0f delay:i*0.05f+1.f options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat animations:^{
+                CGRect frame = view.frame;
+//                frame.origin.y = frame.origin.y + 2.5*i;
+                frame.size.height = 10;
+                view.frame = frame;
+            } completion:nil];
+            i++;
         }
     }
 }
@@ -208,22 +241,22 @@
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     
-    self.isAnimating= YES;
-    
-    UITouch *touch= [touches anyObject];
-    [self touchHandler:touch];
+//    UITouch *touch= [touches anyObject];
+    //[self touchHandler:touch isAnimating:YES];
 }
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     UITouch *touch= [touches anyObject];
+    self.isAnimating=YES;
     [self touchHandler:touch];
+    //self.isAnimating=NO;
     
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    self.isAnimating= NO;
-    UITouch *touch= [touches anyObject];
-    [self touchHandler:touch];
+    //self.isAnimating= NO;
+//    UITouch *touch= [touches anyObject];
+    //[self touchHandler:touch isAnimating:YES];
     
 }
 
